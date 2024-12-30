@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	screenWidth  = 600
-	screenHeight = 600
+	screenWidth  = 800
+	screenHeight = 800
 	tileSize     = 20
 	gridTop      = 20
 	gridWidth    = screenWidth / tileSize
@@ -211,6 +211,33 @@ func (w *World) countLiveNeighbors(x, y int) int {
 	return liveNeighbors
 }
 
+// generateGosperGliderGun generates a Gosper Glider Gun
+func (w *World) generateGosperGliderGun() {
+	// Clear the current cells
+	w.liveCells = make(map[tile]struct{})
+	// Gosper Glider Gun
+	gliderGun := []tile{
+		{1, 5}, {1, 6}, {2, 5}, {2, 6},
+		{11, 5}, {11, 6}, {11, 7},
+		{12, 4}, {12, 8},
+		{13, 3}, {13, 9},
+		{14, 3}, {14, 9},
+		{15, 6},
+		{16, 4}, {16, 8},
+		{17, 5}, {17, 6}, {17, 7},
+		{18, 6},
+		{21, 3}, {21, 4}, {21, 5},
+		{22, 3}, {22, 4}, {22, 5},
+		{23, 2}, {23, 6},
+		{25, 1}, {25, 2}, {25, 6}, {25, 7},
+		{35, 3}, {35, 4},
+		{36, 3}, {36, 4},
+	}
+	for _, cell := range gliderGun {
+		w.liveCells[cell] = struct{}{}
+	}
+}
+
 type Game struct {
 	world *World
 }
@@ -241,6 +268,11 @@ func (g *Game) Update() error {
 		g.world.isSimulating = false
 	}
 
+	// handle glider gun on 1 key
+	if inpututil.IsKeyJustPressed(ebiten.Key1) {
+		g.world.generateGosperGliderGun()
+	}
+
 	// Run the simulation every 200ms if the simulation is running
 	if g.world.isSimulating && time.Since(g.world.lastUpdate) > 300*time.Millisecond {
 		g.world.SimulateWorld()
@@ -263,14 +295,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 600, 600
+	return 800, 800
 }
 
 func main() {
 	// Initialize the world
 	world := NewWorld(screenWidth, screenHeight, tileSize)
 	game := &Game{world: world}
-	ebiten.SetWindowSize(640, 640)
+	ebiten.SetWindowSize(840, 840)
 	ebiten.SetWindowTitle("Game Of Life!")
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
